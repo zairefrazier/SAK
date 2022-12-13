@@ -8,25 +8,36 @@
 import Foundation
 
 
-struct GameModel<CardContent> {
+struct GameModel<CardContent> where CardContent: Equatable {
     private(set) var cards: Array<Card>
     
+    private var indexOfTheOneAndOnlyFaceCard: Int?
     
     mutating func chooseCard(_ card: Card) {
         
-        let choosenIndex = index(of: card)
-        cards[choosenIndex].isFaceUp.toggle()
-        print("Choosen Card = \(cards)")
-        
-    }
-    
-    func index(of card:Card) -> Int {
-        for index in 0..<cards.count {
-            if cards[index].id == card.id {
-                return index
+        if let choosenIndex = cards.firstIndex(where: {$0.id == card.id }),
+           !cards[choosenIndex].isFaceUp,
+            !cards[choosenIndex].isMatched
+        {
+            if let potenialMatchIndex = indexOfTheOneAndOnlyFaceCard {
+                if cards[choosenIndex].content == cards[potenialMatchIndex].content {
+                    cards[choosenIndex].isMatched = true
+                    cards[potenialMatchIndex].isMatched = true
+                }
+                indexOfTheOneAndOnlyFaceCard = nil
+                
             }
+            else {
+                for index in 0..<cards.count {
+                    cards[index].isFaceUp = false
+                }
+                
+                indexOfTheOneAndOnlyFaceCard = choosenIndex
+            }
+            
+            cards[choosenIndex].isFaceUp.toggle()
         }
-        return 0
+        print("Choosen Card = \(cards)")
     }
     
     init(numbersOfPairsOfCards: Int, createCardContent: (Int)-> CardContent){
@@ -38,12 +49,10 @@ struct GameModel<CardContent> {
             cards.append(Card(content:  content, id: pairIndex*2+1))
             
         }
-        
     }
     
-    
     struct Card: Identifiable {
-        var isFaceUp: Bool = true
+        var isFaceUp: Bool = false
         
         var isMatched: Bool = false
         
@@ -52,6 +61,4 @@ struct GameModel<CardContent> {
         var id: Int
         
     }
-    
-    
 }
