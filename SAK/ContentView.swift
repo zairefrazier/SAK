@@ -8,29 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
-
+    
     @ObservedObject var viewModel: EmojiMemeryGame
     
     var body: some View {
         
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    
-                    ForEach(viewModel.caard) { card in
-                        CardView(card: card)
-                            .aspectRatio(2/3,contentMode: .fit)
-                            .onTapGesture {
-                                viewModel.chooseCard(card)
-                            }
-                    }
-                    
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
+                
+                ForEach(viewModel.caard) { card in
+                    CardView(card: card)
+                        .aspectRatio(2/3,contentMode: .fit)
+                        .onTapGesture {
+                            viewModel.chooseCard(card)
+                        }
                 }
+                
             }
-            .foregroundColor(.red)
-            .padding(.horizontal)
-    
+        }
+        .foregroundColor(.red)
+        .padding(.horizontal)
     }
-    
 }
 
 
@@ -48,6 +46,9 @@ struct CardView: View {
                     .strokeBorder(lineWidth: 3)
                 Text(card.content)
                     .font(.largeTitle)
+            }else if card.isMatched {
+                RoundedRectangle(cornerRadius: 20)
+                    .opacity(0)
             }
             else {
                 RoundedRectangle(cornerRadius: 20)
